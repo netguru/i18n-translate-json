@@ -78,7 +78,37 @@ var run = function(apiKey, dir, sourceLanguage, languages, finish) {
       // create targets for every language
       for (var l in languages) {
         var lang = languages[l];
-        targets[lang] = traverse(traversed.clone());
+
+        // read existing translation file
+        var langData;
+
+        try {
+          langData = fs.readFileSync(dir + lang + ".json", "utf8");
+
+          langData = langData.toString();
+
+          var langParsed;
+
+          // parse and traverse translation file
+          try {
+            langParsed = JSON.parse(langData);
+          } catch (e) {
+            return callback({ file: file, error: e }, null);
+          }
+          var langTraversed = traverse(langParsed);
+
+          // clear translated paths that are no longer in the source file
+          langTraversed.forEach(function() {
+            if (!traversed.has(this.path)) {
+              this.remove();
+            }
+          });
+
+          targets[lang] = langTraversed;
+
+        } catch {
+          targets[lang] = traverse(traversed.clone());
+        }
       }
 
       // find all paths of the object keys recursively
@@ -96,6 +126,11 @@ var run = function(apiKey, dir, sourceLanguage, languages, finish) {
 
         // translate every language for this path
         async.map(languages, function(language, translated) {
+
+          // check if translation already exists at path
+          if (targets[language].get(path) !== traversed.get(path)) {
+            return translated(null, null);
+          }
 
           // translate the text
           translate(text, language, function(err, translation) {
