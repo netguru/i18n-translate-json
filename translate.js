@@ -80,12 +80,8 @@ var run = function(apiKey, dir, sourceLanguage, languages, finish) {
         var lang = languages[l];
 
         // read existing translation file
-        var langData;
-
         try {
-          langData = fs.readFileSync(dir + lang + ".json", "utf8");
-
-          langData = langData.toString();
+          var langData = fs.readFileSync(dir + lang + ".json", "utf8").toString();
 
           var langParsed;
 
