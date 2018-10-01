@@ -124,7 +124,8 @@ var run = function(apiKey, dir, sourceLanguage, languages, finish) {
         async.map(languages, function(language, translated) {
 
           // check if translation already exists at path
-          if (targets[language].get(path) !== traversed.get(path)) {
+          var targetText = targets[language].get(path);
+          if (targetText && targetText !== traversed.get(path)) {
             return translated(null, null);
           }
 
