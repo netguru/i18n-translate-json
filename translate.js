@@ -102,7 +102,7 @@ var run = function(apiKey, dir, sourceLanguage, languages, finish) {
 
           targets[lang] = langTraversed;
 
-        } catch {
+        } catch (e) {
           targets[lang] = traverse(traversed.clone());
         }
       }
